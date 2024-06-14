@@ -7,16 +7,30 @@ Library  RequestsLibrary
 ${HOMEPAGE_URL}    https://bwpool.azurewebsites.net/
 ${PROXY}  http://idebproxy01.itsh.itsh-internal.hu:3128
 ${BASE_URL}  https://random-data-api.com/api/users/random_user?size=1
+${BASE_URL_DEVICE}  https://random-data-api.com/api/device/random_device?size=2
 
 # Locators
-${PARTNEREK}    //a[contains(.,'Partnerek')]
-${ADD_UGYFEL}    //span[.='Add']
+${PARTNEREK_LOKATOR}    //a[contains(.,'Partnerek')]
+${ADD_UGYFEL_LOKATOR}    //span[.='Add']
 ${UGYFEL_NEV_LOKATOR}    //input[@id='name']
 ${UGYFEL_EMAIL_LOKATOR}    //input[@id='email']
 ${UGYFEL_TELEFON_LOKATOR}    //input[@class='e-control e-numerictextbox e-lib e-input']
 ${UGYFEL_MEGJEGYZES_LOKATOR}    //input[@id='comment']
 ${UGYFEL_ADATOK_MENTES_LOKATOR}    //button[@class='e-control e-btn e-lib e-control e-btn e-lib e-primary e-flat']
 ${TELEPHELY_LOKATOR}    //a[contains(.,'Telephelyek')]
+${ADD_TELEPHELY_LOKATOR}    //span[.='Add']
+${UJTELEPHELY_UGYFEL_KIVALASZTAS_LOKATOR}    //input[@class='e-control e-combobox e-lib e-input']
+
+${VAROS_LOKATOR}    //input[@id='varos']
+${IRANYITOSZAM_LOKATOR}    //input[@id='zip']
+${UTCA_LOKATOR}    //input[@id='utca']
+${HAZSZAM_LOKATOR}    //input[@id='szam']
+${TELEPHELY_ADATOK_MENTES_LOKATOR}    //button[@class='e-control e-btn e-lib e-control e-btn e-lib e-primary e-flat']
+
+${ESZKOZOK_LOKATOR}    //a[contains(.,'Eszközök')]
+${ADD_ESZKOZ_LOKATOR}    //span[.='Add']
+
+
 #Error Massages
 
 
@@ -24,7 +38,8 @@ ${TELEPHELY_LOKATOR}    //a[contains(.,'Telephelyek')]
 ${BROWSER}    Chrome 
 ${UGYFELEK_GRID_ID}    Grid
 ${TELEPHELY_GRID_ID}    Grid
-#${UGYFEL_NEV}
+${ESZKOZ_GRID_ID}    "Grid"
+...    #${UGYFEL_NEV}
 
 *** Keywords ***
 Test Setup
@@ -40,6 +55,17 @@ Alkalmazas megnyilik
     Should Be Equal    ${actual_url}    ${expected_url}
     Sleep    5sec
 
+Menupont aktivalasa Tabla megjelenik
+    [Arguments]    ${menupont_lokator}    ${tabla_id}    ${cimsor}    ${mezo}    
+    Wait Until Element Is Visible    ${menupont_lokator}
+    Click Element    ${menupont_lokator}
+    Sleep    10sec
+    Element Should Be Visible    id=${tabla_id}
+    #Sleep    5sec
+    Page Should Contain    ${tabla_id}
+    Page Should Contain    ${cimsor}
+    Page Should Contain    ${mezo}
+
 Partnerek menupont Ugyfelek tabla megjelenik
     Wait Until Element Is Visible    ${PARTNEREK}
     Click Element    ${PARTNEREK}
@@ -54,14 +80,14 @@ Partnerek menupont Ugyfelek tabla megjelenik
 
 Uj Partner rogzitese
     [Arguments]    ${ugyfel_nev}    ${ugyfel_email}    ${ugyfel_id}    
-    Click Element    ${ADD_UGYFEL}
-    Sleep    5s
+    Click Element    ${ADD_UGYFEL_LOKATOR}
+    Sleep    2s
     Input Text    ${UGYFEL_NEV_LOKATOR}    ${ugyfel_nev}
     Input Text    ${UGYFEL_EMAIL_LOKATOR}    ${ugyfel_email}
     Input Text    ${UGYFEL_MEGJEGYZES_LOKATOR}    ${ugyfel_id}
-    Sleep    5sec  
+    Sleep    2sec  
     Click Element    ${UGYFEL_ADATOK_MENTES_LOKATOR}
-    Sleep    5sec
+    Sleep    2sec
 
 Ugyfel megjelenik a grid listaban
     [Arguments]    ${ugyfel_nev}    ${ugyfel_email}    ${ugyfel_id}  
@@ -79,3 +105,27 @@ Telephely menupont Telephely tabla megjelenik
     Page Should Contain    Telephelyek
     Page Should Contain    Ügyfél
     Page Should Contain    Város
+
+Uj Telephely rogzitese
+    [Arguments]    ${nev}    ${varos}    ${iranyitoszam}    ${utca}    ${hazszam}    
+    Click Element    ${ADD_TELEPHELY_LOKATOR}
+    #Select From List By Label    ${UJTELEPHELY_UGYFEL_KIVALASZTAS_LOKATOR}    ${nev}
+    Sleep    5s
+    Input Text    ${UJTELEPHELY_UGYFEL_KIVALASZTAS_LOKATOR}    ${nev}
+    Sleep    5s
+    Input Text    ${VAROS_LOKATOR}    ${varos}
+    Input Text    ${IRANYITOSZAM_LOKATOR}    ${iranyitoszam}
+    Input Text    ${UTCA_LOKATOR}    ${utca}
+    Input Text    ${HAZSZAM_LOKATOR}    ${hazszam}
+    Sleep    5sec  
+    Click Element    ${TELEPHELY_ADATOK_MENTES_LOKATOR}
+    Sleep    5sec
+
+Telephely megjelenik a grid listaban
+    [Arguments]    ${nev}    ${varos}    ${iranyitoszam}    ${utca}  
+    Page Should Contain    ${nev}
+    Page Should Contain    ${varos}
+    #Page Should Contain    ${iranyitoszam} 
+    # Page should have contained text '89162' but did not.
+    # Page should have contained text '06401' but did not.
+    Page Should Contain    ${utca}
