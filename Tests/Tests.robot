@@ -7,10 +7,10 @@ Test Teardown    Test Teardown
 
 *** Test Cases ***
 Testcase
-    Alkalmazas megnyilik    ${HOMEPAGE_URL}
+    Oldal megnyilik    ${HOMEPAGE_URL}
     Menupont aktivalasa Tabla megjelenik    ${PARTNEREK_LOKATOR}    ${UGYFELEK_GRID_ID}    Ügyfelek    Neve
     
-    #User adatok bekerese
+    #Partner adatok bekerese
     ${headers}=  Create Dictionary  Content-Type=application/json
     ${proxies}=  Create Dictionary  http=${PROXY}  https=${PROXY}
     ${response}=  GET  ${BASE_URL}  proxies=${proxies}
@@ -29,12 +29,32 @@ Testcase
     ${HAZSZAM}    Set Variable     
 
     Uj Telephely rogzitese    ${UGYFEL_NEV}    ${VAROS}    ${IRANYITOSZAM}    ${UTCA}    ${HAZSZAM}
+    ${TELEPHELY}    set Variable    ${IRANYITOSZAM} ${VAROS}, ${UTCA}
     Telephely megjelenik a grid listaban    ${UGYFEL_NEV}    ${VAROS}    ${IRANYITOSZAM}    ${UTCA}
+   
+    Menupont aktivalasa Tabla megjelenik    ${ESZKOZOK_LOKATOR}    ${ESZKOZ_GRID_ID}    Eszközök    Azonosító
+    
     #új eszköz
-    ${headers}=  Create Dictionary  Content-Type=application/json
+    ${headers_device}=  Create Dictionary  Content-Type=application/json
     ${proxies}=  Create Dictionary  http=${PROXY}  https=${PROXY}
-    ${response}=  GET  ${BASE_URL}  proxies=${proxies}
-    ${body}    Set Variable    ${response.json()}
-    #Log    ${body}
+    ${response_device}=  GET  ${BASE_URL_DEVICE}  headers=${headers_device}    proxies=${proxies}
+    ${body_device}    Set Variable    ${response_device.json()}
+    FOR    ${index}    IN RANGE    0    2    
+        
+        ${ESZKOZ_NEV}    Set Variable    ${body_device}[${index}][manufacturer] ${body_device}[${index}][model]
+        ${LEIRAS}    Set Variable    ${body_device}[${index}][platform]
+        ${MEGJEGYZES}    Set Variable    ${body_device}[${index}][serial_number]
 
-    Menupont aktivalasa Tabla megjelenik    ${ESZKOZOK_LOKATOR}    $ESZKOZ_GRID_ID    Eszközök    Azonosító
+        Uj Eszkoz rogzitese    ${ESZKOZ_NEV}    ${UGYFEL_NEV}    ${TELEPHELY}    ${LEIRAS}    ${MEGJEGYZES}
+        Eszkoz megjelenik a grid listaban    ${ESZKOZ_NEV}    ${UGYFEL_NEV}    ${TELEPHELY}    ${LEIRAS}    ${MEGJEGYZES}
+    END
+    Menupont aktivalasa Tabla megjelenik    ${ESZKOZOK_LOKATOR}    ${ESZKOZ_GRID_ID}    Eszközök    Azonosító
+    Eszkozok excel fileba exportalasa
+    Sleep    5sec
+    
+    Menupont aktivalasa Tabla megjelenik    ${TELEPHELY_LOKATOR}    ${TELEPHELY_GRID_ID}    Telephelyek    Ügyfél
+    Szures adott elemre    ${TELEPHELY_KERESES_LOKATOR}    ${UGYFEL_NEV}    ${KERESES_INDITASA_LOKATOR}
+    Sleep    5sec
+
+    Utca mezore kattintas
+    Sleep    5sec

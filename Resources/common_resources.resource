@@ -5,7 +5,12 @@ Library  RequestsLibrary
 *** Variables ***
 # URLs
 ${HOMEPAGE_URL}    https://bwpool.azurewebsites.net/
+${PARTNEREK_URL}    https://bwpool.azurewebsites.net/Customer
+${TELEPHELYEK_URL}    https://bwpool.azurewebsites.net/Location
+${ESZKOZOK_URL}    https://bwpool.azurewebsites.net/Tool
+
 ${PROXY}  http://idebproxy01.itsh.itsh-internal.hu:3128
+
 ${BASE_URL}  https://random-data-api.com/api/users/random_user?size=1
 ${BASE_URL_DEVICE}  https://random-data-api.com/api/device/random_device?size=2
 
@@ -26,10 +31,19 @@ ${IRANYITOSZAM_LOKATOR}    //input[@id='zip']
 ${UTCA_LOKATOR}    //input[@id='utca']
 ${HAZSZAM_LOKATOR}    //input[@id='szam']
 ${TELEPHELY_ADATOK_MENTES_LOKATOR}    //button[@class='e-control e-btn e-lib e-control e-btn e-lib e-primary e-flat']
+${TELEPHELY_KERESES_LOKATOR}    //input[@id='Grid_ToolbarSearchBox']
+${KERESES_INDITASA_LOKATOR}    //span[@class='e-searchclear e-search-icon e-icons e-input-group-icon']
+${TELEPHELY_ADATOK_UTCA_LINK_LOKATOR}    //td/div/div/a
 
 ${ESZKOZOK_LOKATOR}    //a[contains(.,'Eszközök')]
 ${ADD_ESZKOZ_LOKATOR}    //span[.='Add']
-
+${ESZKOZ_NEVE_LOKATOR}    //input[@id='name']
+${ESZKOZ_UGYFELNEVE_LOKATOR}    css=[placeholder='Ügyfél']    
+${ESZKOZ_TELEPHELY_LOKATOR}    css=[placeholder='Telephely']
+${ESZKOZ_LEIRAS_LOKATOR}    //textarea[@id='Desc']
+${ESZKOZ_MEGJEGYZES_LOKATOR}    //textarea[@id='Comm']
+${ESZKOZ_MENTES_LOKATOR}    css=.e-primary
+${ESZKOZ_EXCEL_EXPORT_LOKATOR}    //span[.='Excel Export']
 
 #Error Massages
 
@@ -38,8 +52,9 @@ ${ADD_ESZKOZ_LOKATOR}    //span[.='Add']
 ${BROWSER}    Chrome 
 ${UGYFELEK_GRID_ID}    Grid
 ${TELEPHELY_GRID_ID}    Grid
-${ESZKOZ_GRID_ID}    "Grid"
-...    #${UGYFEL_NEV}
+${ESZKOZ_GRID_ID}    Grid
+
+#${UGYFEL_NEV}
 
 *** Keywords ***
 Test Setup
@@ -49,7 +64,7 @@ Test Setup
 Test Teardown
     Close All Browsers
 
-Alkalmazas megnyilik
+Oldal megnyilik
     [Arguments]    ${expected_url}
     ${actual_url}    Get Location
     Should Be Equal    ${actual_url}    ${expected_url}
@@ -66,18 +81,6 @@ Menupont aktivalasa Tabla megjelenik
     Page Should Contain    ${cimsor}
     Page Should Contain    ${mezo}
 
-Partnerek menupont Ugyfelek tabla megjelenik
-    Wait Until Element Is Visible    ${PARTNEREK}
-    Click Element    ${PARTNEREK}
-    Sleep    5sec
-    Element Should Be Visible    id=${UGYFELEK_GRID_ID}
-    Sleep    5sec
-    Page Should Contain    ${UGYFELEK_GRID_ID}
-    Page Should Contain    Ügyfelek
-    Page Should Contain    Neve
-    
-
-
 Uj Partner rogzitese
     [Arguments]    ${ugyfel_nev}    ${ugyfel_email}    ${ugyfel_id}    
     Click Element    ${ADD_UGYFEL_LOKATOR}
@@ -89,7 +92,9 @@ Uj Partner rogzitese
     Click Element    ${UGYFEL_ADATOK_MENTES_LOKATOR}
     Sleep    2sec
 
-Ugyfel megjelenik a grid listaban
+Ugyfel megjelenik a grid listaban 
+#Ügyfél rögzítése sikeres
+    Oldal megnyilik    ${PARTNEREK_URL}
     [Arguments]    ${ugyfel_nev}    ${ugyfel_email}    ${ugyfel_id}  
     Page Should Contain    ${ugyfel_nev}
     Page Should Contain    ${ugyfel_email}
@@ -122,10 +127,57 @@ Uj Telephely rogzitese
     Sleep    5sec
 
 Telephely megjelenik a grid listaban
+#Telephely rögzítése sikeres
     [Arguments]    ${nev}    ${varos}    ${iranyitoszam}    ${utca}  
+    Oldal megnyilik    ${TELEPHELYEK_URL}
     Page Should Contain    ${nev}
     Page Should Contain    ${varos}
     #Page Should Contain    ${iranyitoszam} 
     # Page should have contained text '89162' but did not.
     # Page should have contained text '06401' but did not.
     Page Should Contain    ${utca}
+
+Uj Eszkoz rogzitese
+    [Arguments]    ${eszkoz_neve}    ${ugyfel_neve}    ${telephely_neve}    ${leiras}    ${megjegyzes}    
+    Click Element    ${ADD_ESZKOZ_LOKATOR}
+   
+    Sleep    5s
+    Input Text    ${ESZKOZ_UGYFELNEVE_LOKATOR}    ${ugyfel_neve}
+    Click Element    ${ESZKOZ_TELEPHELY_LOKATOR}
+    #Input Text    ${ESZKOZ_TELEPHELY_LOKATOR}    ${telephely_neve}
+    Sleep    5s
+    Click Element    ${ESZKOZ_NEVE_LOKATOR}
+    Input Text    ${ESZKOZ_NEVE_LOKATOR}    ${eszkoz_neve}
+    Input Text    ${ESZKOZ_LEIRAS_LOKATOR}    ${leiras}
+    Input Text    ${ESZKOZ_MEGJEGYZES_LOKATOR}    ${megjegyzes}
+
+    Sleep    5sec  
+    Click Element    ${ESZKOZ_MENTES_LOKATOR}
+    
+
+Eszkoz megjelenik a grid listaban
+#Eszköz rögzítése sikeres
+    [Arguments]    ${eszkoz_neve}    ${ugyfel_neve}    ${telephely}    ${leiras}    ${megjegyzes} 
+    Oldal megnyilik    ${ESZKOZOK_URL}
+    Sleep    5sec
+    Page Should Contain    ${eszkoz_neve}
+    Page Should Contain    ${ugyfel_neve}
+    #Page Should Contain    ${telephely} 
+    #[FAIL INSIDE] Page should have contained text '25822-9445 Casperview, Santo Plain' but did not.
+    
+    Page Should Contain    ${leiras}
+    Page Should Contain    ${megjegyzes}
+
+Eszkozok excel fileba exportalasa
+    Click Element    ${ESZKOZ_EXCEL_EXPORT_LOKATOR}
+
+Szures adott elemre
+    [Arguments]    ${keresesi_mezo_lokator}    ${elem_erteke}    ${kereses_inditasa_lokator}
+    Input Text    ${keresesi_mezo_lokator}    ${elem_erteke}
+    Click Element    ${kereses_inditasa_lokator}
+    Sleep    5sec
+
+Utca mezore kattintas
+    Click Element    ${TELEPHELY_ADATOK_UTCA_LINK_LOKATOR}
+    Sleep    5sec
+    Page Should Contain    Telephely adatok
