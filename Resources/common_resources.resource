@@ -1,6 +1,9 @@
 *** Settings ***
 Library    SeleniumLibrary
 Library  RequestsLibrary
+Library    OperatingSystem
+Library    Collections
+Library    String
 
 *** Variables ***
 # URLs
@@ -25,6 +28,7 @@ ${UGYFEL_ADATOK_MENTES_LOKATOR}    //button[@class='e-control e-btn e-lib e-cont
 ${TELEPHELY_LOKATOR}    //a[contains(.,'Telephelyek')]
 ${ADD_TELEPHELY_LOKATOR}    //span[.='Add']
 ${UJTELEPHELY_UGYFEL_KIVALASZTAS_LOKATOR}    //input[@class='e-control e-combobox e-lib e-input']
+${TELEPHELY_EREDMENYTABLA_LOKATOR}    css=div.e-gridcontent
 
 ${VAROS_LOKATOR}    //input[@id='varos']
 ${IRANYITOSZAM_LOKATOR}    //input[@id='zip']
@@ -54,6 +58,11 @@ ${UGYFELEK_GRID_ID}    Grid
 ${TELEPHELY_GRID_ID}    Grid
 ${ESZKOZ_GRID_ID}    Grid
 
+${ELVART_FILE}    Export.xlsx
+${LETOLTOTT_FILE_NEVE}    ${EMPTY}
+
+${LETOLTESMAPPA_ELERESE}    C:\\Users\\A200324019\\Downloads
+
 #${UGYFEL_NEV}
 
 *** Keywords ***
@@ -71,10 +80,11 @@ Oldal megnyilik
     Sleep    5sec
 
 Menupont aktivalasa Tabla megjelenik
-    [Arguments]    ${menupont_lokator}    ${tabla_id}    ${cimsor}    ${mezo}    
+    [Arguments]    ${menupont_lokator}    ${tabla_id}    ${cimsor}    ${mezo}    ${elvart_url}   
     Wait Until Element Is Visible    ${menupont_lokator}
     Click Element    ${menupont_lokator}
     Sleep    10sec
+    Oldal megnyilik    ${elvart_url} 
     Element Should Be Visible    id=${tabla_id}
     #Sleep    5sec
     Page Should Contain    ${tabla_id}
@@ -113,6 +123,7 @@ Telephely menupont Telephely tabla megjelenik
 
 Uj Telephely rogzitese
     [Arguments]    ${nev}    ${varos}    ${iranyitoszam}    ${utca}    ${hazszam}    
+    Wait Until Element Is Visible    ${ADD_TELEPHELY_LOKATOR}
     Click Element    ${ADD_TELEPHELY_LOKATOR}
     #Select From List By Label    ${UJTELEPHELY_UGYFEL_KIVALASZTAS_LOKATOR}    ${nev}
     Sleep    5s
@@ -169,13 +180,36 @@ Eszkoz megjelenik a grid listaban
     Page Should Contain    ${megjegyzes}
 
 Eszkozok excel fileba exportalasa
+    ${letoltott_fileok}=    List Files In Directory    ${LETOLTESMAPPA_ELERESE}
+    Wait Until Element Is Visible    ${ESZKOZ_EXCEL_EXPORT_LOKATOR}
     Click Element    ${ESZKOZ_EXCEL_EXPORT_LOKATOR}
+    Sleep    10sec
+    Ellenorzes uj letoltes    ${letoltott_fileok}
+    
+Ellenorzes uj letoltes
+    [Arguments]    ${kiindulas_letoltesi_lista}
+    ${letoltodott}    Set Variable    ${False}
+    WHILE    ${letoltodott} == ${False}
+        
+        ${aktualis_letoltesi_lista}=    List Files In Directory    ${LETOLTESMAPPA_ELERESE}
+        ${kiindulas_letoltesi_lista_hossza}=    Get Length    ${kiindulas_letoltesi_lista}
+        ${aktualis_letoltesi_lista_hossza}=    Get Length    ${aktualis_letoltesi_lista}
+        IF    ${kiindulas_letoltesi_lista_hossza} < ${aktualis_letoltesi_lista_hossza}
+             ${letoltodott}    Set Variable    ${True}
+             
+        END
+    END
+    
+    
 
 Szures adott elemre
     [Arguments]    ${keresesi_mezo_lokator}    ${elem_erteke}    ${kereses_inditasa_lokator}
     Input Text    ${keresesi_mezo_lokator}    ${elem_erteke}
     Click Element    ${kereses_inditasa_lokator}
     Sleep    5sec
+    ${sorok_szama}    Get Element Count    ${TELEPHELY_EREDMENYTABLA_LOKATOR}
+    Should Be Equal As Integers    ${sorok_szama}    1
+    Element Should Contain    ${TELEPHELY_EREDMENYTABLA_LOKATOR}    ${elem_erteke}
 
 Utca mezore kattintas
     Click Element    ${TELEPHELY_ADATOK_UTCA_LINK_LOKATOR}

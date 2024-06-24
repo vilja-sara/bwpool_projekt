@@ -8,7 +8,7 @@ Test Teardown    Test Teardown
 *** Test Cases ***
 Testcase
     Oldal megnyilik    ${HOMEPAGE_URL}
-    Menupont aktivalasa Tabla megjelenik    ${PARTNEREK_LOKATOR}    ${UGYFELEK_GRID_ID}    Ügyfelek    Neve
+    Menupont aktivalasa Tabla megjelenik    ${PARTNEREK_LOKATOR}    ${UGYFELEK_GRID_ID}    Ügyfelek    Neve    ${PARTNEREK_URL}
     
     #Partner adatok bekerese
     ${headers}=  Create Dictionary  Content-Type=application/json
@@ -22,7 +22,7 @@ Testcase
     Uj Partner rogzitese    ${UGYFEL_NEV}    ${UGYFEL_EMAIL}    ${UGYFEL_ID}
     Ugyfel megjelenik a grid listaban    ${UGYFEL_NEV}    ${UGYFEL_EMAIL}    ${UGYFEL_ID}
     
-    Menupont aktivalasa Tabla megjelenik    ${TELEPHELY_LOKATOR}    ${TELEPHELY_GRID_ID}    Telephelyek    Ügyfél
+    Menupont aktivalasa Tabla megjelenik    ${TELEPHELY_LOKATOR}    ${TELEPHELY_GRID_ID}    Telephelyek    Ügyfél    ${TELEPHELYEK_URL}
     ${VAROS}    Set Variable    ${body}[0][address][city]
     ${IRANYITOSZAM}    Set Variable    ${body}[0][address][zip_code]
     ${UTCA}    Set Variable    ${body}[0][address][street_name]
@@ -32,7 +32,7 @@ Testcase
     ${TELEPHELY}    set Variable    ${IRANYITOSZAM} ${VAROS}, ${UTCA}
     Telephely megjelenik a grid listaban    ${UGYFEL_NEV}    ${VAROS}    ${IRANYITOSZAM}    ${UTCA}
    
-    Menupont aktivalasa Tabla megjelenik    ${ESZKOZOK_LOKATOR}    ${ESZKOZ_GRID_ID}    Eszközök    Azonosító
+    Menupont aktivalasa Tabla megjelenik    ${ESZKOZOK_LOKATOR}    ${ESZKOZ_GRID_ID}    Eszközök    Azonosító    ${ESZKOZOK_URL}
     
     #új eszköz
     ${headers_device}=  Create Dictionary  Content-Type=application/json
@@ -48,11 +48,11 @@ Testcase
         Uj Eszkoz rogzitese    ${ESZKOZ_NEV}    ${UGYFEL_NEV}    ${TELEPHELY}    ${LEIRAS}    ${MEGJEGYZES}
         Eszkoz megjelenik a grid listaban    ${ESZKOZ_NEV}    ${UGYFEL_NEV}    ${TELEPHELY}    ${LEIRAS}    ${MEGJEGYZES}
     END
-    Menupont aktivalasa Tabla megjelenik    ${ESZKOZOK_LOKATOR}    ${ESZKOZ_GRID_ID}    Eszközök    Azonosító
+    Menupont aktivalasa Tabla megjelenik    ${ESZKOZOK_LOKATOR}    ${ESZKOZ_GRID_ID}    Eszközök    Azonosító    ${ESZKOZOK_URL}
     Eszkozok excel fileba exportalasa
     Sleep    5sec
     
-    Menupont aktivalasa Tabla megjelenik    ${TELEPHELY_LOKATOR}    ${TELEPHELY_GRID_ID}    Telephelyek    Ügyfél
+    Menupont aktivalasa Tabla megjelenik    ${TELEPHELY_LOKATOR}    ${TELEPHELY_GRID_ID}    Telephelyek    Ügyfél    ${TELEPHELYEK_URL}
     Szures adott elemre    ${TELEPHELY_KERESES_LOKATOR}    ${UGYFEL_NEV}    ${KERESES_INDITASA_LOKATOR}
     Sleep    5sec
 
