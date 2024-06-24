@@ -58,7 +58,6 @@ ${UGYFELEK_GRID_ID}    Grid
 ${TELEPHELY_GRID_ID}    Grid
 ${ESZKOZ_GRID_ID}    Grid
 
-${ELVART_FILE}    Export.xlsx
 ${LETOLTOTT_FILE_NEVE}    ${EMPTY}
 
 ${LETOLTESMAPPA_ELERESE}    C:\\Users\\A200324019\\Downloads
@@ -83,10 +82,9 @@ Menupont aktivalasa Tabla megjelenik
     [Arguments]    ${menupont_lokator}    ${tabla_id}    ${cimsor}    ${mezo}    ${elvart_url}   
     Wait Until Element Is Visible    ${menupont_lokator}
     Click Element    ${menupont_lokator}
-    Sleep    10sec
+    #Sleep    10sec
     Oldal megnyilik    ${elvart_url} 
     Element Should Be Visible    id=${tabla_id}
-    #Sleep    5sec
     Page Should Contain    ${tabla_id}
     Page Should Contain    ${cimsor}
     Page Should Contain    ${mezo}
@@ -94,13 +92,15 @@ Menupont aktivalasa Tabla megjelenik
 Uj Partner rogzitese
     [Arguments]    ${ugyfel_nev}    ${ugyfel_email}    ${ugyfel_id}    
     Click Element    ${ADD_UGYFEL_LOKATOR}
-    Sleep    2s
+    #Sleep    2s
+    Wait Until Element Is Visible    ${UGYFEL_NEV_LOKATOR}
     Input Text    ${UGYFEL_NEV_LOKATOR}    ${ugyfel_nev}
     Input Text    ${UGYFEL_EMAIL_LOKATOR}    ${ugyfel_email}
     Input Text    ${UGYFEL_MEGJEGYZES_LOKATOR}    ${ugyfel_id}
-    Sleep    2sec  
+    #Sleep    2sec  
+    Wait Until Element Is Visible    ${UGYFEL_ADATOK_MENTES_LOKATOR}
     Click Element    ${UGYFEL_ADATOK_MENTES_LOKATOR}
-    Sleep    2sec
+    #Sleep    2sec
 
 Ugyfel megjelenik a grid listaban 
 #Ügyfél rögzítése sikeres
@@ -113,9 +113,11 @@ Ugyfel megjelenik a grid listaban
 Telephely menupont Telephely tabla megjelenik
     Wait Until Element Is Visible    ${TELEPHELY_LOKATOR}
     Click Element    ${TELEPHELY_LOKATOR}
-    Sleep    5sec
+    #Sleep    5sec
+    Wait Until Element Is Visible    ${TELEPHELY_GRID_ID}
     Element Should Be Visible    id=${TELEPHELY_GRID_ID}
-    Sleep    5sec
+    #Sleep    5sec
+    Wait Until Element Is Visible    ${TELEPHELY_GRID_ID}
     Page Should Contain    ${TELEPHELY_GRID_ID}
     Page Should Contain    Telephelyek
     Page Should Contain    Ügyfél
@@ -126,14 +128,17 @@ Uj Telephely rogzitese
     Wait Until Element Is Visible    ${ADD_TELEPHELY_LOKATOR}
     Click Element    ${ADD_TELEPHELY_LOKATOR}
     #Select From List By Label    ${UJTELEPHELY_UGYFEL_KIVALASZTAS_LOKATOR}    ${nev}
-    Sleep    5s
+    #Sleep    5s
+    Wait Until Element Is Visible    ${UJTELEPHELY_UGYFEL_KIVALASZTAS_LOKATOR}
     Input Text    ${UJTELEPHELY_UGYFEL_KIVALASZTAS_LOKATOR}    ${nev}
-    Sleep    5s
+    #Sleep    5s
+    Wait Until Element Is Visible    ${VAROS_LOKATOR}
     Input Text    ${VAROS_LOKATOR}    ${varos}
     Input Text    ${IRANYITOSZAM_LOKATOR}    ${iranyitoszam}
     Input Text    ${UTCA_LOKATOR}    ${utca}
     Input Text    ${HAZSZAM_LOKATOR}    ${hazszam}
-    Sleep    5sec  
+    #Sleep    5sec  
+    Wait Until Element Is Visible    ${TELEPHELY_ADATOK_MENTES_LOKATOR}
     Click Element    ${TELEPHELY_ADATOK_MENTES_LOKATOR}
     Sleep    5sec
 
@@ -150,19 +155,22 @@ Telephely megjelenik a grid listaban
 
 Uj Eszkoz rogzitese
     [Arguments]    ${eszkoz_neve}    ${ugyfel_neve}    ${telephely_neve}    ${leiras}    ${megjegyzes}    
+    Wait Until Element Is Visible    ${ADD_ESZKOZ_LOKATOR}
     Click Element    ${ADD_ESZKOZ_LOKATOR}
-   
-    Sleep    5s
+    #Sleep    5s
+    Wait Until Element Is Visible    ${ESZKOZ_UGYFELNEVE_LOKATOR}
     Input Text    ${ESZKOZ_UGYFELNEVE_LOKATOR}    ${ugyfel_neve}
     Click Element    ${ESZKOZ_TELEPHELY_LOKATOR}
     #Input Text    ${ESZKOZ_TELEPHELY_LOKATOR}    ${telephely_neve}
-    Sleep    5s
+    #Sleep    5s
+    Wait Until Element Is Visible    ${ESZKOZ_NEVE_LOKATOR}
     Click Element    ${ESZKOZ_NEVE_LOKATOR}
     Input Text    ${ESZKOZ_NEVE_LOKATOR}    ${eszkoz_neve}
     Input Text    ${ESZKOZ_LEIRAS_LOKATOR}    ${leiras}
     Input Text    ${ESZKOZ_MEGJEGYZES_LOKATOR}    ${megjegyzes}
 
-    Sleep    5sec  
+    #Sleep    5sec  
+    Wait Until Element Is Visible    ${ESZKOZ_MENTES_LOKATOR}
     Click Element    ${ESZKOZ_MENTES_LOKATOR}
     
 
@@ -175,7 +183,6 @@ Eszkoz megjelenik a grid listaban
     Page Should Contain    ${ugyfel_neve}
     #Page Should Contain    ${telephely} 
     #[FAIL INSIDE] Page should have contained text '25822-9445 Casperview, Santo Plain' but did not.
-    
     Page Should Contain    ${leiras}
     Page Should Contain    ${megjegyzes}
 
@@ -183,7 +190,7 @@ Eszkozok excel fileba exportalasa
     ${letoltott_fileok}=    List Files In Directory    ${LETOLTESMAPPA_ELERESE}
     Wait Until Element Is Visible    ${ESZKOZ_EXCEL_EXPORT_LOKATOR}
     Click Element    ${ESZKOZ_EXCEL_EXPORT_LOKATOR}
-    Sleep    10sec
+    #Sleep    10sec
     Ellenorzes uj letoltes    ${letoltott_fileok}
     
 Ellenorzes uj letoltes
@@ -206,7 +213,8 @@ Szures adott elemre
     [Arguments]    ${keresesi_mezo_lokator}    ${elem_erteke}    ${kereses_inditasa_lokator}
     Input Text    ${keresesi_mezo_lokator}    ${elem_erteke}
     Click Element    ${kereses_inditasa_lokator}
-    Sleep    5sec
+    #Sleep    5sec
+    Wait Until Element Is Visible    ${TELEPHELY_EREDMENYTABLA_LOKATOR}
     ${sorok_szama}    Get Element Count    ${TELEPHELY_EREDMENYTABLA_LOKATOR}
     Should Be Equal As Integers    ${sorok_szama}    1
     Element Should Contain    ${TELEPHELY_EREDMENYTABLA_LOKATOR}    ${elem_erteke}
